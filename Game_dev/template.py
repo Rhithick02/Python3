@@ -17,7 +17,7 @@ BLACK = (0, 0, 0)
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((HEIGHT,WIDTH))
-pygame.displae.set_caption("----")
+pygame.display.set_caption("----")
 clock = pygame.time.Clock()
 
 # Game loop
@@ -28,6 +28,8 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+    # Update
+    # Draw/Render
     screen.fill(BLACK)
     pygame.display.flip()
 pygame.quit()
