@@ -21,15 +21,17 @@ class Player(pygame.sprite.Sprite):
         self.image.set_colorkey(BLACK)
         # self.image.fill(GREEN)
         self.rect = self.image.get_rect()
+        self.radius = 20
+        # pygame.draw.circle(self.image, RED, self.rect.center, self.radius)
         self.rect.center = ((360,670))
         self.speed = 0
     def update(self):
         self.speed = 0
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_LEFT]:
-            self.speed = -8
+            self.speed = -10
         if keystate[pygame.K_RIGHT]:
-            self.speed = 8
+            self.speed = 10
         self.rect.x+= self.speed
         if self.rect.x < 0:
             self.rect.x = 0
@@ -46,9 +48,11 @@ class Enemy(pygame.sprite.Sprite):
         self.image.set_colorkey(BLACK)
         # self.image.fill(RED)
         self.rect = self.image.get_rect()
+        self.radius = 20
+        # pygame.draw.circle(self.image, BLUE, self.rect.center, self.radius)
         self.rect.x = random.randrange(0,WIDTH-20)
         self.rect.y = random.randrange(-100,-40)
-        self.speed = random.randrange(2,8)
+        self.speed = random.randrange(4,12)
     def update(self):
         self.rect.y += self.speed
         if self.rect.y > HEIGHT+10:
@@ -113,7 +117,7 @@ while running:
         enemy = Enemy()
         all_sprites.add(enemy)
         all_oponnents.add(enemy)
-    hits = pygame.sprite.spritecollide(player, all_oponnents, False)
+    hits = pygame.sprite.spritecollide(player, all_oponnents, False, pygame.sprite.collide_circle)
     if hits:
         running = False
     screen.fill(BLACK)
