@@ -79,6 +79,8 @@ class Enemy(pygame.sprite.Sprite):
         self.rot = 0
         self.rot_speed = random.randrange(-8,8)
         self.last_update = pygame.time.get_ticks()
+        self.cur = pygame.time.get_ticks()
+        self.const = 0
     def rotate(self):
         now = pygame.time.get_ticks()
         if now - self.last_update > 50:
@@ -92,10 +94,14 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         self.rotate()
         self.rect.y += self.speed
+        now = pygame.time.get_ticks()
+        if now - self.cur >= 20000 and self.const <= 10:
+                self.cur = now
+                self.const += 2
         if self.rect.y > HEIGHT+10:
             self.rect.x = random.randrange(0,WIDTH-20)
             self.rect.y = random.randrange(-100,-40)
-            self.speed = random.randrange(2,8)
+            self.speed = random.randrange(2+self.const,8+self.const)
 class Bullets(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
@@ -105,11 +111,32 @@ class Bullets(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.bottom = y
         self.rect.x = x
-        self.speed = 8
+        self.speed = 10
     def update(self):
         self.rect.y-= self.speed
         if self.rect.bottom < 0:
             self.kill()
+class Explosion(pygame.sprite.Sprite):
+    def __init__(self, center):
+        pygame.sprite.Sprite.__init__(self)
+        self.frame_rate = 50
+        self.frame = 0
+        self.image = expl[self.frame]
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.ti = pygame.time.get_ticks()
+    def update(self):
+        now = pygame.time.get_ticks()
+        if now - self.ti > self.frame:
+            self.ti = now
+            self.frame += 1
+            if self.frame == len(expl):
+                self.kill()
+            else:
+                center = self.rect.center
+                self.image = expl[self.frame]
+                self.rect = self.image.get_rect()
+                self.rect.center = center
 
 # Setting up screen
 pygame.init()
@@ -129,10 +156,16 @@ for imge in meteor_list:
     meteor_img.append(pygame.image.load(os.path.join(img, imge)).convert())
 radius_lvl = [20, 16, 10, 5]
 laser = pygame.image.load(os.path.join(img, "laserRed01.png")).convert()
-
+expl = []
+for i in range(9):
+    name = 'regularExplosion0'+str(i)+'.png'
+    te_img = pygame.image.load(os.path.join(img, name)).convert()
+    te_img.set_colorkey(BLACK)
+    nw_img = pygame.transform.scale(te_img, (75, 75))
+    expl.append(nw_img)
 #Sound 
 snd = os.path.dirname("/home/rhithick/Desktop/NITT/Code/Python3/Game_dev/Sound_Effects/")
-shoot_sound = pygame.mixer.Sound(os.path.join(snd, "laser_pew.wav"))
+shoot_sound = pygame.mixer.Sound(os.path.join(snd, "sfx_laser1.ogg"))
 pygame.mixer.music.load(os.path.join(snd, "tgfcoder-FrozenJam-SeamlessLoop.ogg"))
 
 
@@ -166,6 +199,8 @@ while running:
     hits = pygame.sprite.groupcollide(all_oponnents, all_bullets, True, True)
     for hit in hits:
         score += 50 - hit.radius
+        exp = Explosion(hit.rect.center)
+        all_sprites.add(exp)
         enemy = Enemy()
         all_sprites.add(enemy)
         all_oponnents.add(enemy)
