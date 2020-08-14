@@ -21,6 +21,16 @@ def draw_text(text, surf, size, x, y):
     text_rect = text_surf.get_rect()
     text_rect.midtop = (x, y)
     surf.blit(text_surf, text_rect)
+def draw_shield(val, x, y, surf):
+    if val < 0:
+        val = 0
+    outline = pygame.Rect(x, y, 100, 20)
+    status = pygame.Rect(x, y, val, 20)
+    if val >= 30:
+        pygame.draw.rect(surf, GREEN, status)
+    else:
+        pygame.draw.rect(surf, RED, status)
+    pygame.draw.rect(surf, WHITE, outline, 2)
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -33,6 +43,7 @@ class Player(pygame.sprite.Sprite):
         # pygame.draw.circle(self.image, RED, self.rect.center, self.radius)
         self.rect.center = ((360,670))
         self.speed = 0
+        self.shield = 100
     def update(self):
         self.speed = 0
         keystate = pygame.key.get_pressed()
@@ -46,6 +57,7 @@ class Player(pygame.sprite.Sprite):
         if self.rect.x > WIDTH-50:
             self.rect.x = WIDTH-50
     def shoot(self):
+        shoot_sound.play()
         bullet = Bullets(self.rect.centerx, self.rect.top)
         all_sprites.add(bullet)
         all_bullets.add(bullet)
@@ -106,7 +118,7 @@ screen = pygame.display.set_mode((HEIGHT,WIDTH))
 pygame.display.set_caption("SHMUP!")
 clock = pygame.time.Clock()
 
-# Locations
+# Graphics
 img = os.path.dirname("/home/rhithick/Desktop/NITT/Code/Python3/Game_dev/images/")
 background = pygame.image.load(os.path.join(img, "starfield.jpg")).convert()
 background_rect = background.get_rect()
@@ -117,6 +129,12 @@ for imge in meteor_list:
     meteor_img.append(pygame.image.load(os.path.join(img, imge)).convert())
 radius_lvl = [20, 16, 10, 5]
 laser = pygame.image.load(os.path.join(img, "laserRed01.png")).convert()
+
+#Sound 
+snd = os.path.dirname("/home/rhithick/Desktop/NITT/Code/Python3/Game_dev/Sound_Effects/")
+shoot_sound = pygame.mixer.Sound(os.path.join(snd, "laser_pew.wav"))
+pygame.mixer.music.load(os.path.join(snd, "tgfcoder-FrozenJam-SeamlessLoop.ogg"))
+
 
 # Sprites
 all_sprites = pygame.sprite.Group()
@@ -130,6 +148,9 @@ for i in range(0,8):
     all_oponnents.add(enemy)
 
 score = 0
+lives = 3
+
+pygame.mixer.music.play(loops=-1)
 # Game loop
 running = True
 while running:
@@ -148,13 +169,25 @@ while running:
         enemy = Enemy()
         all_sprites.add(enemy)
         all_oponnents.add(enemy)
-    hits = pygame.sprite.spritecollide(player, all_oponnents, False, pygame.sprite.collide_circle)
-    if hits:
-        running = False
+    hits = pygame.sprite.spritecollide(player, all_oponnents, True, pygame.sprite.collide_circle)
+    for hit in hits:
+        enemy = Enemy()
+        all_sprites.add(enemy)
+        all_oponnents.add(enemy)
+        player.shield -= 2*hit.radius
+        if player.shield <=0:
+            lives -= 1
+            player.shield = 100
+            if lives == 0:
+                running = False
     screen.fill(BLACK)
     screen.blit(background, background_rect)
     all_sprites.draw(screen)
-    buf = "Score: " + str(score)
-    draw_text(buf, screen, 18, WIDTH/2, 10)
+    buf1 = "Score: " + str(score)
+    buf2 = "Lives x " + str(lives)
+    buf3 = "Health - " + str(player.shield)
+    draw_text(buf2, screen, 18, 100, 50)
+    draw_text(buf1, screen, 18, WIDTH/2, 10)
+    draw_shield(player.shield, 50, 30, screen)
     pygame.display.flip()
 pygame.quit()
