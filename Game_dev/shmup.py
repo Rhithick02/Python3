@@ -41,10 +41,15 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.radius = 20
         # pygame.draw.circle(self.image, RED, self.rect.center, self.radius)
-        self.rect.center = ((360,670))
+        self.rect.center = (360, 670)
         self.speed = 0
         self.shield = 100
+        self.lives = 3
+        self.hidden = False
     def update(self):
+        if self.hidden and pygame.time.get_ticks() - self.hidden_time > 1000:
+            self.hidden = False
+            self.rect.center = (360, 670)
         self.speed = 0
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_LEFT]:
@@ -61,6 +66,10 @@ class Player(pygame.sprite.Sprite):
         bullet = Bullets(self.rect.centerx, self.rect.top)
         all_sprites.add(bullet)
         all_bullets.add(bullet)
+    def hide(self):
+        self.hidden = True
+        self.hidden_time = pygame.time.get_ticks()
+        self.rect.center = (360, -10000)
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -117,11 +126,12 @@ class Bullets(pygame.sprite.Sprite):
         if self.rect.bottom < 0:
             self.kill()
 class Explosion(pygame.sprite.Sprite):
-    def __init__(self, center):
+    def __init__(self, center, size):
         pygame.sprite.Sprite.__init__(self)
         self.frame_rate = 50
+        self.size = size
         self.frame = 0
-        self.image = expl[self.frame]
+        self.image = expl[size][self.frame]
         self.rect = self.image.get_rect()
         self.rect.center = center
         self.ti = pygame.time.get_ticks()
@@ -134,7 +144,7 @@ class Explosion(pygame.sprite.Sprite):
                 self.kill()
             else:
                 center = self.rect.center
-                self.image = expl[self.frame]
+                self.image = expl[self.size][self.frame]
                 self.rect = self.image.get_rect()
                 self.rect.center = center
 
@@ -150,19 +160,24 @@ img = os.path.dirname("/home/rhithick/Desktop/NITT/Code/Python3/Game_dev/images/
 background = pygame.image.load(os.path.join(img, "starfield.jpg")).convert()
 background_rect = background.get_rect()
 ship = pygame.image.load(os.path.join(img, "playerShip2_green.png")).convert()
+ship_mini = pygame.transform.scale(ship, (45, 30))
 meteor_img = []
 meteor_list = ['meteorBrown_big1.png', 'meteorBrown_med1.png', 'meteorBrown_small1.png', 'meteorBrown_tiny1.png']
 for imge in meteor_list:
     meteor_img.append(pygame.image.load(os.path.join(img, imge)).convert())
 radius_lvl = [20, 16, 10, 5]
 laser = pygame.image.load(os.path.join(img, "laserRed01.png")).convert()
-expl = []
+expl = {}
+expl['lg'] = []
+expl['sm'] = []
 for i in range(9):
     name = 'regularExplosion0'+str(i)+'.png'
     te_img = pygame.image.load(os.path.join(img, name)).convert()
     te_img.set_colorkey(BLACK)
-    nw_img = pygame.transform.scale(te_img, (75, 75))
-    expl.append(nw_img)
+    nw_img1 = pygame.transform.scale(te_img, (75, 75))
+    nw_img2 = pygame.transform.scale(te_img, (32, 32))
+    expl['lg'].append(nw_img1)
+    expl['sm'].append(nw_img2)
 #Sound 
 snd = os.path.dirname("/home/rhithick/Desktop/NITT/Code/Python3/Game_dev/Sound_Effects/")
 shoot_sound = pygame.mixer.Sound(os.path.join(snd, "sfx_laser1.ogg"))
@@ -181,7 +196,6 @@ for i in range(0,8):
     all_oponnents.add(enemy)
 
 score = 0
-lives = 3
 
 pygame.mixer.music.play(loops=-1)
 # Game loop
@@ -199,27 +213,30 @@ while running:
     hits = pygame.sprite.groupcollide(all_oponnents, all_bullets, True, True)
     for hit in hits:
         score += 50 - hit.radius
-        exp = Explosion(hit.rect.center)
-        all_sprites.add(exp)
+        exp_l = Explosion(hit.rect.center, 'lg')
+        all_sprites.add(exp_l)
         enemy = Enemy()
         all_sprites.add(enemy)
         all_oponnents.add(enemy)
     hits = pygame.sprite.spritecollide(player, all_oponnents, True, pygame.sprite.collide_circle)
     for hit in hits:
         enemy = Enemy()
+        exp_s = Explosion(hit.rect.center,'sm')
+        all_sprites.add(exp_s)
         all_sprites.add(enemy)
         all_oponnents.add(enemy)
         player.shield -= 2*hit.radius
         if player.shield <=0:
-            lives -= 1
+            player.hide()
+            player.lives -= 1
             player.shield = 100
-            if lives == 0:
+            if player.lives == 0:
                 running = False
     screen.fill(BLACK)
     screen.blit(background, background_rect)
     all_sprites.draw(screen)
     buf1 = "Score: " + str(score)
-    buf2 = "Lives x " + str(lives)
+    buf2 = "Lives: " + str(player.lives)
     buf3 = "Health - " + str(player.shield)
     draw_text(buf2, screen, 18, 100, 50)
     draw_text(buf1, screen, 18, WIDTH/2, 10)
