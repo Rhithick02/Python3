@@ -15,6 +15,11 @@ BLACK = (0, 0, 0)
 YELLOW = (255, 255, 0)
 
 font_name = pygame.font.match_font('arial')
+def draw_lives(surf, x, y):
+    for i in range(player.lives):
+        img_rect = ship_mini.get_rect()
+        img_rect.center = (x + i*30, y)
+        surf.blit(ship_mini, img_rect)
 def draw_text(text, surf, size, x, y):
     font = pygame.font.Font(font_name, size)
     text_surf = font.render(text, True, WHITE)
@@ -22,6 +27,8 @@ def draw_text(text, surf, size, x, y):
     text_rect.midtop = (x, y)
     surf.blit(text_surf, text_rect)
 def draw_shield(val, x, y, surf):
+    if val > 100:
+        val = 100
     if val < 0:
         val = 0
     outline = pygame.Rect(x, y, 100, 20)
@@ -31,7 +38,6 @@ def draw_shield(val, x, y, surf):
     else:
         pygame.draw.rect(surf, RED, status)
     pygame.draw.rect(surf, WHITE, outline, 2)
-
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -39,23 +45,28 @@ class Player(pygame.sprite.Sprite):
         self.image.set_colorkey(BLACK)
         # self.image.fill(GREEN)
         self.rect = self.image.get_rect()
-        self.radius = 20
+        self.radius = 23
         # pygame.draw.circle(self.image, RED, self.rect.center, self.radius)
         self.rect.center = (360, 670)
         self.speed = 0
+        self.buf = 10
         self.shield = 100
         self.lives = 3
         self.hidden = False
+        self.p = False
     def update(self):
+        if self.p and pygame.time.get_ticks() - self.ptime > 10000:
+            self.hidden = False
+            self.buf = 10
         if self.hidden and pygame.time.get_ticks() - self.hidden_time > 1000:
             self.hidden = False
             self.rect.center = (360, 670)
         self.speed = 0
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_LEFT]:
-            self.speed = -10
+            self.speed = -self.buf
         if keystate[pygame.K_RIGHT]:
-            self.speed = 10
+            self.speed = self.buf
         self.rect.x+= self.speed
         if self.rect.x < 0:
             self.rect.x = 0
@@ -70,6 +81,10 @@ class Player(pygame.sprite.Sprite):
         self.hidden = True
         self.hidden_time = pygame.time.get_ticks()
         self.rect.center = (360, -10000)
+    def pspeed(self):
+        self.p = True
+        self.ptime = pygame.time.get_ticks()
+        self.buf = 16
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -147,6 +162,19 @@ class Explosion(pygame.sprite.Sprite):
                 self.image = expl[self.size][self.frame]
                 self.rect = self.image.get_rect()
                 self.rect.center = center
+class Power_up(pygame.sprite.Sprite):
+    def __init__(self, center):
+        pygame.sprite.Sprite.__init__(self)
+        self.type = random.choice(['health', 'speed'])
+        self.image = pup[self.type]
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.speed = 5
+    def update(self):
+        self.rect.y += self.speed
+        if self.rect.top > HEIGHT:
+            self.kill()
 
 # Setting up screen
 pygame.init()
@@ -160,7 +188,8 @@ img = os.path.dirname("/home/rhithick/Desktop/NITT/Code/Python3/Game_dev/images/
 background = pygame.image.load(os.path.join(img, "starfield.jpg")).convert()
 background_rect = background.get_rect()
 ship = pygame.image.load(os.path.join(img, "playerShip2_green.png")).convert()
-ship_mini = pygame.transform.scale(ship, (45, 30))
+ship_mini = pygame.transform.scale(ship, (30, 20))
+ship_mini.set_colorkey(BLACK)
 meteor_img = []
 meteor_list = ['meteorBrown_big1.png', 'meteorBrown_med1.png', 'meteorBrown_small1.png', 'meteorBrown_tiny1.png']
 for imge in meteor_list:
@@ -178,6 +207,9 @@ for i in range(9):
     nw_img2 = pygame.transform.scale(te_img, (32, 32))
     expl['lg'].append(nw_img1)
     expl['sm'].append(nw_img2)
+pup = {}
+pup['health'] = pygame.image.load(os.path.join(img, 'pill_green.png')).convert()
+pup['speed'] = pygame.image.load(os.path.join(img, 'bolt_gold.png')).convert()
 #Sound 
 snd = os.path.dirname("/home/rhithick/Desktop/NITT/Code/Python3/Game_dev/Sound_Effects/")
 shoot_sound = pygame.mixer.Sound(os.path.join(snd, "sfx_laser1.ogg"))
@@ -188,13 +220,13 @@ pygame.mixer.music.load(os.path.join(snd, "tgfcoder-FrozenJam-SeamlessLoop.ogg")
 all_sprites = pygame.sprite.Group()
 all_oponnents = pygame.sprite.Group()
 all_bullets = pygame.sprite.Group()
+all_pups = pygame.sprite.Group()
 player = Player()
 all_sprites.add(player)
 for i in range(0,8):
     enemy = Enemy()
     all_sprites.add(enemy)
     all_oponnents.add(enemy)
-
 score = 0
 
 pygame.mixer.music.play(loops=-1)
@@ -210,14 +242,21 @@ while running:
             if event.key == pygame.K_SPACE:
                 player.shoot()
     all_sprites.update()
+    # Bullets and meteor
     hits = pygame.sprite.groupcollide(all_oponnents, all_bullets, True, True)
     for hit in hits:
+        ran = random.randrange(20)
         score += 50 - hit.radius
         exp_l = Explosion(hit.rect.center, 'lg')
         all_sprites.add(exp_l)
+        if ran == 1:
+            power = Power_up(hit.rect.center)
+            all_sprites.add(power)
+            all_pups.add(power)
         enemy = Enemy()
         all_sprites.add(enemy)
         all_oponnents.add(enemy)
+    # Ship and meteor
     hits = pygame.sprite.spritecollide(player, all_oponnents, True, pygame.sprite.collide_circle)
     for hit in hits:
         enemy = Enemy()
@@ -232,14 +271,20 @@ while running:
             player.shield = 100
             if player.lives == 0:
                 running = False
+    # Ship and powerup
+    hits = pygame.sprite.spritecollide(player, all_pups, True)
+    for hit in hits:
+        if hit.type == "health":
+            player.shield += 50
+        if hit.type == "speed":
+            player.pspeed()
     screen.fill(BLACK)
     screen.blit(background, background_rect)
     all_sprites.draw(screen)
     buf1 = "Score: " + str(score)
-    buf2 = "Lives: " + str(player.lives)
     buf3 = "Health - " + str(player.shield)
-    draw_text(buf2, screen, 18, 100, 50)
     draw_text(buf1, screen, 18, WIDTH/2, 10)
     draw_shield(player.shield, 50, 30, screen)
+    draw_lives(screen, 630, 20)
     pygame.display.flip()
 pygame.quit()
