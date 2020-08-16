@@ -38,6 +38,21 @@ def draw_shield(val, x, y, surf):
     else:
         pygame.draw.rect(surf, RED, status)
     pygame.draw.rect(surf, WHITE, outline, 2)
+def gameover():
+    screen.blit(background, background_rect)
+    draw_text("SHOOT 'EM UP", screen, 64, WIDTH / 2, 200)
+    draw_text("Move left < | Move right >", screen, 30, WIDTH / 2, 400)
+    draw_text("Space bar to shoot", screen, 30, WIDTH / 2, 500)
+    draw_text("Press a key to start your space ride", screen, 30, WIDTH / 2, 600)
+    pygame.display.flip()
+    waiting = True
+    while waiting:
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYDOWN:
+                waiting = False
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -51,7 +66,7 @@ class Player(pygame.sprite.Sprite):
         self.speed = 0
         self.buf = 10
         self.shield = 100
-        self.lives = 3
+        self.lives = 1
         self.hidden = False
         self.p = False
     def update(self):
@@ -184,7 +199,8 @@ pygame.display.set_caption("SHMUP!")
 clock = pygame.time.Clock()
 
 # Graphics
-img = os.path.dirname("/home/rhithick/Desktop/NITT/Code/Python3/Game_dev/images/")
+img = os.path.dirname(os.path.realpath(__file__))
+img = os.path.join(img, 'images')
 background = pygame.image.load(os.path.join(img, "starfield.jpg")).convert()
 background_rect = background.get_rect()
 ship = pygame.image.load(os.path.join(img, "playerShip2_green.png")).convert()
@@ -211,7 +227,8 @@ pup = {}
 pup['health'] = pygame.image.load(os.path.join(img, 'pill_green.png')).convert()
 pup['speed'] = pygame.image.load(os.path.join(img, 'bolt_gold.png')).convert()
 #Sound 
-snd = os.path.dirname("/home/rhithick/Desktop/NITT/Code/Python3/Game_dev/Sound_Effects/")
+snd = os.path.dirname(os.path.realpath(__file__))
+snd = os.path.join(snd, 'Sound_Effects')
 shoot_sound = pygame.mixer.Sound(os.path.join(snd, "sfx_laser1.ogg"))
 pygame.mixer.music.load(os.path.join(snd, "tgfcoder-FrozenJam-SeamlessLoop.ogg"))
 
@@ -229,11 +246,26 @@ for i in range(0,8):
     all_oponnents.add(enemy)
 score = 0
 
-pygame.mixer.music.play(loops=-1)
+pygame.mixer.music.play(loops = -1)
 # Game loop
+game_over = True
 running = True
 while running:
     clock.tick(FPS)
+    if game_over:
+        gameover()
+        game_over = False
+        all_sprites = pygame.sprite.Group()
+        all_oponnents = pygame.sprite.Group()
+        all_bullets = pygame.sprite.Group()
+        all_pups = pygame.sprite.Group()
+        player = Player()
+        all_sprites.add(player)
+        for i in range(0,8):
+            enemy = Enemy()
+            all_sprites.add(enemy)
+            all_oponnents.add(enemy)
+        score = 0
     # Exiting
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -270,7 +302,18 @@ while running:
             player.lives -= 1
             player.shield = 100
             if player.lives == 0:
-                running = False
+                screen.blit(background, background_rect)
+                draw_text("GAME OVER", screen, 30, WIDTH / 2, 300)
+                draw_text("SCORE : " + str(score), screen, 25, WIDTH / 2, 330)
+                pygame.display.flip()
+                wait  = True
+                while wait:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                        elif event.type == pygame.KEYDOWN:
+                            wait = False
+                game_over = True
     # Ship and powerup
     hits = pygame.sprite.spritecollide(player, all_pups, True)
     for hit in hits:
@@ -282,7 +325,6 @@ while running:
     screen.blit(background, background_rect)
     all_sprites.draw(screen)
     buf1 = "Score: " + str(score)
-    buf3 = "Health - " + str(player.shield)
     draw_text(buf1, screen, 18, WIDTH/2, 10)
     draw_shield(player.shield, 50, 30, screen)
     draw_lives(screen, 630, 20)
