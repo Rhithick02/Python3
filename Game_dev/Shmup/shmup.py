@@ -207,7 +207,8 @@ ship = pygame.image.load(os.path.join(img, "playerShip2_green.png")).convert()
 ship_mini = pygame.transform.scale(ship, (30, 20))
 ship_mini.set_colorkey(BLACK)
 meteor_img = []
-meteor_list = ['meteorBrown_big1.png', 'meteorBrown_med1.png', 'meteorBrown_small1.png', 'meteorBrown_tiny1.png']
+meteor_list = ['meteorBrown_big1.png', 'meteorBrown_med1.png', 
+                'meteorBrown_small1.png', 'meteorBrown_tiny1.png']
 for imge in meteor_list:
     meteor_img.append(pygame.image.load(os.path.join(img, imge)).convert())
 radius_lvl = [20, 16, 10, 5]
