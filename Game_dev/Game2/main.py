@@ -15,8 +15,12 @@ class Game:
 
     def new(self):
         self.all_sprites = pg.sprite.Group()
+        self.platform = pg.sprite.Group()
         self.player = Player()
+        self.ground = Ground(0, 650, WIDTH, 70)
         self.all_sprites.add(self.player)
+        self.all_sprites.add(self.ground)
+        self.platform.add(self.ground)
         self.run()
 
     def run(self):
@@ -29,7 +33,10 @@ class Game:
 
     def update(self):
         self.all_sprites.update()
-
+        hits = pg.sprite.spritecollide(self.player, self.platform, False)
+        if hits:
+            self.player.pos.y = hits[0].rect.top
+            self.player.vel.y = 0
     def events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
