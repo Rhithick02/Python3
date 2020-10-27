@@ -16,9 +16,10 @@ BLUE = (0, 0, 255)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 YELLOW = (255, 255, 0)
+ORANGE = (100, 64.7, 0)
 MIX = (100, 255, 100)
 
-
+#Functions
 def draw_text(text, surf, size, x, y, colour):
     font = pygame.font.Font(font_name, size)
     text_surf = font.render(text, True, colour)
@@ -38,7 +39,7 @@ def input_value(string, string_x, string_y, val_x, val_y, colour):
     draw_text(string, screen, 18, string_x, string_y, colour)
     waiting = True
     string = ''
-    screen.fill(BLACK, rect = (val_x, val_y - 7.5, WIDTH / 10, 30))
+    screen.fill(ORANGE, rect = (val_x, val_y - 7.5, WIDTH / 10, 30))
     while waiting:
         for te in pygame.event.get():
             if te.type == pygame.QUIT:
@@ -51,7 +52,7 @@ def input_value(string, string_x, string_y, val_x, val_y, colour):
                 elif te.key == pygame.K_BACKSPACE:
                     n = len(string)
                     string = string[:n-1]
-                    screen.fill(BLACK, rect = (val_x, val_y, WIDTH / 10, 15))
+                    screen.fill(ORANGE, rect = (val_x, val_y, WIDTH / 10, 15))
                 else:
                     string += te.unicode
         text_surf = base_font.render(string, False, WHITE)
@@ -64,7 +65,7 @@ def input_value2(string, string_x, string_y, val_x, val_y, colour, real, imag):
     draw_text(string, screen, 18, string_x, string_y, colour)
     waiting = True
     string = ''
-    screen.fill(BLACK, rect = (val_x, val_y - 7.5, WIDTH / 10, 30))
+    screen.fill(ORANGE, rect = (val_x, val_y - 7.5, WIDTH / 10, 30))
     screen.fill(BLACK, rect = (val_x + 15, val_y + 30, WIDTH / 10, 30))
     draw_text('j', screen, 14, val_x + 5, val_y + 35, WHITE)
     pygame.draw.circle(screen, WHITE, (val_x+5, val_y+33), 1)
@@ -81,7 +82,7 @@ def input_value2(string, string_x, string_y, val_x, val_y, colour, real, imag):
                 elif te.key == pygame.K_BACKSPACE:
                     n = len(string)
                     string = string[:n-1]
-                    screen.fill(BLACK, rect = (val_x, val_y, WIDTH / 10, 15))
+                    screen.fill(ORANGE, rect = (val_x, val_y, WIDTH / 10, 15))
                 else:
                     string += te.unicode
         text_surf = base_font.render(string, False, WHITE)
@@ -89,6 +90,7 @@ def input_value2(string, string_x, string_y, val_x, val_y, colour, real, imag):
         pygame.display.flip()
     if running:
         waiting = True
+        screen.fill(ORANGE, rect = (val_x + 15, val_y + 30, WIDTH / 10, 30))
     string = ' '
     while waiting:
         for te in pygame.event.get():
@@ -102,99 +104,123 @@ def input_value2(string, string_x, string_y, val_x, val_y, colour, real, imag):
                 elif te.key == pygame.K_BACKSPACE:
                     n = len(string)
                     string = string[:n-1]
-                    screen.fill(BLACK, rect = (val_x+15, val_y+35, WIDTH / 10, 15))
+                    screen.fill(ORANGE, rect = (val_x+15, val_y+35, WIDTH / 10, 15))
                 else:
                     string += te.unicode
         text_surf = base_font.render(string, False, WHITE)
         screen.blit(text_surf, (val_x+20, val_y + 35))
         pygame.display.flip()
 
-def ytoz():
-    y11 = complex(yreal[0], yimag[0])
-    y12 = complex(yreal[1], yimag[1])
-    y21 = complex(yreal[2], yimag[2])
-    y22 = complex(yreal[3], yimag[3])
-    det = y11 * y22 - y12 * y21
-    zreal.append((y22 / det).real)
-    zimag.append((y22 / det).imag)
-    zreal.append((-y12 / det).real)
-    zimag.append((-y12 / det).imag)
-    zreal.append((-y21 / det).real)
-    zimag.append((-y21 / det).imag)
-    zreal.append((y11 / det).real)
-    zimag.append((y11 / det).imag)
+def ytoz(zreal, zimag):
+    try :
+        y11 = complex(yreal[0], yimag[0])
+        y12 = complex(yreal[1], yimag[1])
+        y21 = complex(yreal[2], yimag[2])
+        y22 = complex(yreal[3], yimag[3])
+        det = y11 * y22 - y12 * y21
+        zreal.append(round((y22 / det).real, 4))
+        zimag.append(round((y22 / det).imag, 4))
+        zreal.append(round((-y12 / det).real, 4))
+        zimag.append(round((-y12 / det).imag, 4))
+        zreal.append(round((-y21 / det).real, 4))
+        zimag.append(round((-y21 / det).imag, 4))
+        zreal.append(round((y11 / det).real, 4))
+        zimag.append(round((y11 / det).imag, 4))
+    except:
+        zreal = []
+        zimag = []
 
-def ztoy():
-    z11 = complex(zreal[0], zimag[0])
-    z12 = complex(zreal[1], zimag[1])
-    z21 = complex(zreal[2], zimag[2])
-    z22 = complex(zreal[3], zimag[3])
-    det = z11 * z22 - z12 * z21
-    yreal.append((z22 / det).real)
-    yimag.append((z22 / det).imag)
-    yreal.append((-z12 / det).real)
-    yimag.append((-z12 / det).imag)
-    yreal.append((-z21 / det).real)
-    yimag.append((-z21 / det).imag)
-    yreal.append((z11 / det).real)
-    yimag.append((z11 / det).imag)
+def ztoy(yreal, yimag):
+    try:
+        z11 = complex(zreal[0], zimag[0])
+        z12 = complex(zreal[1], zimag[1])
+        z21 = complex(zreal[2], zimag[2])
+        z22 = complex(zreal[3], zimag[3])
+        det = z11 * z22 - z12 * z21
+        yreal.append(round((z22 / det).real, 4))
+        yimag.append(round((z22 / det).imag, 4))
+        yreal.append(round((-z12 / det).real, 4))
+        yimag.append(round((-z12 / det).imag, 4))
+        yreal.append(round((-z21 / det).real, 4))
+        yimag.append(round((-z21 / det).imag, 4))
+        yreal.append(round((z11 / det).real, 4))
+        yimag.append(round((z11 / det).imag, 4))
+    except:
+        yreal = []
+        yimag = []
 
-def ytot():
-    y11 = complex(yreal[0], yimag[0])
-    y12 = complex(yreal[1], yimag[1])
-    y21 = complex(yreal[2], yimag[2])
-    y22 = complex(yreal[3], yimag[3])
-    det = y12 * y21 - y11 * y22
-    treal.append((-y22 / y21).real)
-    timag.append((-y22 / y21).imag)
-    treal.append((-1 / y21).real)
-    timag.append((-1 / y21).imag)
-    treal.append((det / y21).real)
-    timag.append((det / y21).imag)
-    treal.append((-y11 / y21).real)
-    timag.append((-y11 / y21).imag)
+def ytot(treal, timag):
+    try:
+        y11 = complex(yreal[0], yimag[0])
+        y12 = complex(yreal[1], yimag[1])
+        y21 = complex(yreal[2], yimag[2])
+        y22 = complex(yreal[3], yimag[3])
+        det = y12 * y21 - y11 * y22
+        treal.append(round((-y22 / y21).real, 4))
+        timag.append(round((-y22 / y21).imag, 4))
+        treal.append(round((-1 / y21).real, 4))
+        timag.append(round((-1 / y21).imag, 4))
+        treal.append(round((det / y21).real, 4))
+        timag.append(round((det / y21).imag, 4))
+        treal.append(round((-y11 / y21).real, 4))
+        timag.append(round((-y11 / y21).imag, 4))
+    except:
+        treal = []
+        timag = []
 
-def ttoy():
-    A = complex(treal[0], timag[0])
-    B = complex(treal[1], timag[1])
-    C = complex(treal[2], timag[2])
-    D = complex(treal[3], timag[3])
-    yreal.append((D / B).real)
-    yimag.append((D / B).imag)
-    yreal.append(((B*C - A*D)/B).real)
-    yimag.append(((B*C - A*D)/B).imag)
-    yreal.append((-1 / B).real)
-    yimag.append((-1 / B).imag)
-    yreal.append((A / B).real)
-    yimag.append((A / B).imag)
+def ttoy(yreal, yimag):
+    try:
+        A = complex(treal[0], timag[0])
+        B = complex(treal[1], timag[1])
+        C = complex(treal[2], timag[2])
+        D = complex(treal[3], timag[3])
+        yreal.append(round((D / B).real, 4))
+        yimag.append(round((D / B).imag, 4))
+        yreal.append(round(((B*C - A*D)/B).real, 4))
+        yimag.append(round(((B*C - A*D)/B).imag, 4))
+        yreal.append(round((-1 / B).real, 4))
+        yimag.append(round((-1 / B).imag, 4))
+        yreal.append(round((A / B).real, 4))
+        yimag.append(round((A / B).imag, 4))
+    except:
+        yreal = []
+        yimag = []
 
-def ttoh():
-    A = complex(treal[0], timag[0])
-    B = complex(treal[1], timag[1])
-    C = complex(treal[2], timag[2])
-    D = complex(treal[3], timag[3])
-    hreal.append((B/D).real)
-    himag.append((B/D).imag)
-    hreal.append(((A*D - B*C)/D).real)
-    himag.append(((A*D - B*C)/D).imag)
-    hreal.append((-1/D).real)
-    himag.append((-1/D).imag)
-    hreal.append((C/D).real)
-    himag.append((C/D).imag)
+def ttoh(hreal, himag):
+    try:
+        A = complex(treal[0], timag[0])
+        B = complex(treal[1], timag[1])
+        C = complex(treal[2], timag[2])
+        D = complex(treal[3], timag[3])
+        hreal.append(round((B/D).real, 4))
+        himag.append(round((B/D).imag, 4))
+        hreal.append(round(((A*D - B*C)/D).real, 4))
+        himag.append(round(((A*D - B*C)/D).imag, 4))
+        hreal.append(round((-1/D).real, 4))
+        himag.append(round((-1/D).imag, 4))
+        hreal.append(round((C/D).real, 4))
+        himag.append(round((C/D).imag, 4))
+    except:
+        hreal = []
+        himag = []
 
-def htot():
-    h11 = complex(hreal[0], himag[0])
-    h12 = complex(hreal[1], himag[1])
-    h21 = complex(hreal[2], himag[2])
-    h22 = complex(hreal[3], himag[3])
-    treal.append(((h12*h21 - h11*h22)/h21).real)
-    timag.append(((h12*h21 - h11*h22)/h21).imag)
-    treal.append((-h11/h21).real)
-    timag.append((-h11/h21).imag)
-    treal.append((-h11/h21).real)
-    timag.append((-h11/h21).imag)
-    treal.append((-1/h21).real)
-    timag.append((-1/h21).imag)
+def htot(treal, timag):
+    try:
+        h11 = complex(hreal[0], himag[0])
+        h12 = complex(hreal[1], himag[1])
+        h21 = complex(hreal[2], himag[2])
+        h22 = complex(hreal[3], himag[3])
+        treal.append(round(((h12*h21 - h11*h22)/h21).real, 4))
+        timag.append(round(((h12*h21 - h11*h22)/h21).imag, 4))
+        treal.append(round((-h11/h21).real, 4))
+        timag.append(round((-h11/h21).imag, 4))
+        treal.append(round((-h11/h21).real, 4))
+        timag.append(round((-h11/h21).imag, 4))
+        treal.append(round((-1/h21).real, 4))
+        timag.append(round((-1/h21).imag, 4))
+    except: 
+        treal = []
+        timag = []
 
 def roundoff(real, imag):
     for i in range(4):
@@ -202,22 +228,52 @@ def roundoff(real, imag):
         imag[i] = round(imag[i], 4)
 
 def addtolist():
-    ans.append("Z11 = " + str(complex(zreal[0], zimag[0])))
-    ans.append("Z12 = " + str(complex(zreal[1], zimag[1])))
-    ans.append("Z21 = " + str(complex(zreal[2], zimag[2])))
-    ans.append("Z22 = " + str(complex(zreal[3], zimag[3])))
-    ans.append("A = " + str(complex(treal[0], timag[0])))
-    ans.append("B = " + str(complex(treal[1], timag[1])))
-    ans.append("C = " + str(complex(treal[2], timag[2])))
-    ans.append("D = " + str(complex(treal[3], timag[3])))
-    ans.append("h11 = " + str(complex(hreal[0], himag[0])))
-    ans.append("h12 = " + str(complex(hreal[1], himag[1])))
-    ans.append("h21 = " + str(complex(hreal[2], himag[2])))
-    ans.append("h22 = " + str(complex(hreal[3], himag[3])))
-    ans.append("Y11 = " + str(complex(yreal[0], yimag[0])))
-    ans.append("Y12 = " + str(complex(yreal[1], yimag[1])))
-    ans.append("Y21 = " + str(complex(yreal[2], yimag[2])))
-    ans.append("Y22 = " + str(complex(yreal[3], yimag[3])))
+    try:
+        ans.append("Z11 = " + str(complex(zreal[0], zimag[0])))
+        ans.append("Z12 = " + str(complex(zreal[1], zimag[1])))
+        ans.append("Z21 = " + str(complex(zreal[2], zimag[2])))
+        ans.append("Z22 = " + str(complex(zreal[3], zimag[3])))
+    except:
+        ans.append("Z11 =  NaN")
+        ans.append("Z12 =  NaN")
+        ans.append("Z21 =  NaN")
+        ans.append("Z22 =  NaN")
+    try:
+        ans.append("A = " + str(complex(treal[0], timag[0])))
+        ans.append("B = " + str(complex(treal[1], timag[1])))
+        ans.append("C = " + str(complex(treal[2], timag[2])))
+        ans.append("D = " + str(complex(treal[3], timag[3])))
+    except:
+        ans.append("A =  NaN")
+        ans.append("B =  NaN")
+        ans.append("C =  NaN")
+        ans.append("D =  NaN")
+    try:
+        ans.append("h11 = " + str(complex(hreal[0], himag[0])))
+        ans.append("h12 = " + str(complex(hreal[1], himag[1])))
+        ans.append("h21 = " + str(complex(hreal[2], himag[2])))
+        ans.append("h22 = " + str(complex(hreal[3], himag[3])))
+    except:
+        ans.append("h11 =  NaN")
+        ans.append("h12 =  NaN")
+        ans.append("h21 =  NaN")
+        ans.append("h22 =  NaN")
+    try:
+        ans.append("Y11 = " + str(complex(yreal[0], yimag[0])))
+        ans.append("Y12 = " + str(complex(yreal[1], yimag[1])))
+        ans.append("Y21 = " + str(complex(yreal[2], yimag[2])))
+        ans.append("Y22 = " + str(complex(yreal[3], yimag[3])))
+    except:
+        ans.append("Y11 =  NaN")
+        ans.append("Y12 =  NaN")
+        ans.append("Y21 =  NaN")
+        ans.append("Y22 =  NaN")
+
+def check(param):
+    if len(param) != 4:
+        for i in range(4):
+            param.append("NaN")
+
 # Setting up screen
 pygame.init()
 pygame.mixer.init()
@@ -239,10 +295,6 @@ op1 = pygame.image.load(os.path.join(loc, 'T-PI.png')).convert()
 op12 = pygame.transform.scale(op1, (380,180))
 op12_rect = op12.get_rect()
 op12_rect.center = (200, 150)
-op2 = pygame.image.load(os.path.join(loc, '2port.jpg')).convert()
-op34 = pygame.transform.scale(op2, (380,180))
-op34_rect = op34.get_rect()
-op34_rect.center = (200, 370)
 op5 = pygame.image.load(os.path.join(loc, 'rlc.jpg')).convert()
 op5 = pygame.transform.scale(op5, (380,180))
 op5_rect = op5.get_rect()
@@ -350,7 +402,6 @@ while running:
                 draw_text2("ABCD", screen, 18, 400, 71, WHITE)
                 draw_text2("h", screen, 18, 550, 71, WHITE)
                 previous = False
-                A = []
                 # Clicking
                 while parameter_page:
                     for sub in pygame.event.get():
@@ -378,10 +429,10 @@ while running:
                                 input_value2("Y11", 25, 150, 55 ,150, GREEN, yreal, yimag)
                                 if running: input_value2("Y12", 25, 250, 55 ,250, GREEN, yreal, yimag)
                                 if running: input_value2("Y21", 25, 350, 55 ,350, GREEN, yreal, yimag)
-                                if running: input_value2("Y21", 25, 450, 55 ,450, GREEN, yreal, yimag)
+                                if running: input_value2("Y22", 25, 450, 55 ,450, GREEN, yreal, yimag)
                                 if running:                                    
-                                    ytoz(), ytot(), ttoh()
-                                    roundoff(zreal, zimag), roundoff(treal, timag), roundoff(hreal, himag)
+                                    ytoz(zreal, zimag), ytot(treal, timag), ttoh(hreal, himag)
+                                    check(zreal), check(treal), check(hreal)
                                     ans = []
                                     addtolist()
                                     for j in range(3):
@@ -395,8 +446,8 @@ while running:
                                 if running: input_value2("Z21", 205, 350, 235 ,350, GREEN, zreal, zimag)
                                 if running: input_value2("Z21", 205, 450, 235 ,450, GREEN, zreal, zimag)
                                 if running:
-                                    ztoy(), ytot(), ttoh()
-                                    roundoff(yreal, yimag), roundoff(treal, timag), roundoff(hreal, himag)
+                                    ztoy(yreal, yimag), ytot(treal, timag), ttoh(hreal, himag)
+                                    check(yreal), check(treal), check(hreal)
                                     ans = []
                                     addtolist()
                                     for i in range(4):
@@ -412,8 +463,8 @@ while running:
                                 if running: input_value2("C", 355, 350, 385 ,350, GREEN, treal, timag)
                                 if running: input_value2("D", 355, 450, 385 ,450, GREEN, treal, timag)
                                 if running:
-                                    ttoy(), ytoz(), ttoh()
-                                    roundoff(yreal, yimag), roundoff(zreal, zimag), roundoff(hreal, himag)
+                                    ttoy(yreal, yimag), ytoz(zreal, zimag), ttoh(hreal, himag)
+                                    check(yreal), check(zreal), check(hreal)
                                     ans = []
                                     addtolist()
                                     for i in range(4):
@@ -430,8 +481,8 @@ while running:
                                 if running: input_value2("h21", 505, 350, 535 ,350, GREEN, hreal, himag)
                                 if running: input_value2("h22", 505, 450, 535 ,450, GREEN, hreal, himag)
                                 if running:
-                                    htot(), ttoy(), ytoz()                                                                        
-                                    roundoff(yreal, yimag), roundoff(zreal, zimag), roundoff(treal, timag)
+                                    htot(treal, timag), ttoy(yreal, yimag), ytoz(zreal, zimag)
+                                    check(yreal), check(zreal), check(treal)
                                     ans = []                                                                        
                                     addtolist()
                                     for i in range(4):
