@@ -58,7 +58,7 @@ def input_value(string, string_x, string_y, val_x, val_y, colour):
         screen.blit(text_surf, (val_x+5, val_y))
         pygame.display.flip()
 
-def input_value2(string, string_x, string_y, val_x, val_y, colour):
+def input_value2(string, string_x, string_y, val_x, val_y, colour, real, imag):
     global running
     global parameter_page
     draw_text(string, screen, 18, string_x, string_y, colour)
@@ -109,6 +109,115 @@ def input_value2(string, string_x, string_y, val_x, val_y, colour):
         screen.blit(text_surf, (val_x+20, val_y + 35))
         pygame.display.flip()
 
+def ytoz():
+    y11 = complex(yreal[0], yimag[0])
+    y12 = complex(yreal[1], yimag[1])
+    y21 = complex(yreal[2], yimag[2])
+    y22 = complex(yreal[3], yimag[3])
+    det = y11 * y22 - y12 * y21
+    zreal.append((y22 / det).real)
+    zimag.append((y22 / det).imag)
+    zreal.append((-y12 / det).real)
+    zimag.append((-y12 / det).imag)
+    zreal.append((-y21 / det).real)
+    zimag.append((-y21 / det).imag)
+    zreal.append((y11 / det).real)
+    zimag.append((y11 / det).imag)
+
+def ztoy():
+    z11 = complex(zreal[0], zimag[0])
+    z12 = complex(zreal[1], zimag[1])
+    z21 = complex(zreal[2], zimag[2])
+    z22 = complex(zreal[3], zimag[3])
+    det = z11 * z22 - z12 * z21
+    yreal.append((z22 / det).real)
+    yimag.append((z22 / det).imag)
+    yreal.append((-z12 / det).real)
+    yimag.append((-z12 / det).imag)
+    yreal.append((-z21 / det).real)
+    yimag.append((-z21 / det).imag)
+    yreal.append((z11 / det).real)
+    yimag.append((z11 / det).imag)
+
+def ytot():
+    y11 = complex(yreal[0], yimag[0])
+    y12 = complex(yreal[1], yimag[1])
+    y21 = complex(yreal[2], yimag[2])
+    y22 = complex(yreal[3], yimag[3])
+    det = y12 * y21 - y11 * y22
+    treal.append((-y22 / y21).real)
+    timag.append((-y22 / y21).imag)
+    treal.append((-1 / y21).real)
+    timag.append((-1 / y21).imag)
+    treal.append((det / y21).real)
+    timag.append((det / y21).imag)
+    treal.append((-y11 / y21).real)
+    timag.append((-y11 / y21).imag)
+
+def ttoy():
+    A = complex(treal[0], timag[0])
+    B = complex(treal[1], timag[1])
+    C = complex(treal[2], timag[2])
+    D = complex(treal[3], timag[3])
+    yreal.append((D / B).real)
+    yimag.append((D / B).imag)
+    yreal.append(((B*C - A*D)/B).real)
+    yimag.append(((B*C - A*D)/B).imag)
+    yreal.append((-1 / B).real)
+    yimag.append((-1 / B).imag)
+    yreal.append((A / B).real)
+    yimag.append((A / B).imag)
+
+def ttoh():
+    A = complex(treal[0], timag[0])
+    B = complex(treal[1], timag[1])
+    C = complex(treal[2], timag[2])
+    D = complex(treal[3], timag[3])
+    hreal.append((B/D).real)
+    himag.append((B/D).imag)
+    hreal.append(((A*D - B*C)/D).real)
+    himag.append(((A*D - B*C)/D).imag)
+    hreal.append((-1/D).real)
+    himag.append((-1/D).imag)
+    hreal.append((C/D).real)
+    himag.append((C/D).imag)
+
+def htot():
+    h11 = complex(hreal[0], himag[0])
+    h12 = complex(hreal[1], himag[1])
+    h21 = complex(hreal[2], himag[2])
+    h22 = complex(hreal[3], himag[3])
+    treal.append(((h12*h21 - h11*h22)/h21).real)
+    timag.append(((h12*h21 - h11*h22)/h21).imag)
+    treal.append((-h11/h21).real)
+    timag.append((-h11/h21).imag)
+    treal.append((-h11/h21).real)
+    timag.append((-h11/h21).imag)
+    treal.append((-1/h21).real)
+    timag.append((-1/h21).imag)
+
+def roundoff(real, imag):
+    for i in range(4):
+        real[i] = round(real[i], 4)
+        imag[i] = round(imag[i], 4)
+
+def addtolist():
+    ans.append("Z11 = " + str(complex(zreal[0], zimag[0])))
+    ans.append("Z12 = " + str(complex(zreal[1], zimag[1])))
+    ans.append("Z21 = " + str(complex(zreal[2], zimag[2])))
+    ans.append("Z22 = " + str(complex(zreal[3], zimag[3])))
+    ans.append("A = " + str(complex(treal[0], timag[0])))
+    ans.append("B = " + str(complex(treal[1], timag[1])))
+    ans.append("C = " + str(complex(treal[2], timag[2])))
+    ans.append("D = " + str(complex(treal[3], timag[3])))
+    ans.append("h11 = " + str(complex(hreal[0], himag[0])))
+    ans.append("h12 = " + str(complex(hreal[1], himag[1])))
+    ans.append("h21 = " + str(complex(hreal[2], himag[2])))
+    ans.append("h22 = " + str(complex(hreal[3], himag[3])))
+    ans.append("Y11 = " + str(complex(yreal[0], yimag[0])))
+    ans.append("Y12 = " + str(complex(yreal[1], yimag[1])))
+    ans.append("Y21 = " + str(complex(yreal[2], yimag[2])))
+    ans.append("Y22 = " + str(complex(yreal[3], yimag[3])))
 # Setting up screen
 pygame.init()
 pygame.mixer.init()
@@ -119,7 +228,6 @@ clock = pygame.time.Clock()
 #All Images and fonts
 loc = os.path.dirname(os.path.realpath(__file__))
 font_name = pygame.font.match_font('arial', bold = True)
-# font_name2 = pygame.font.match_font('arial', bold = False)
 base_font = pygame.font.Font(None, 25)
 background1 = pygame.image.load(os.path.join(loc, 'background1.jpg')).convert()
 background1_rect = background1.get_rect()
@@ -231,8 +339,10 @@ while running:
                 screen.fill(BLACK)
                 screen.blit(background3, background3_rect)
                 draw_text("Parameter Conversion", screen, 18, 360, 20, GREEN)
-                real = []
-                imag = []
+                zreal, zimag = [], []
+                yreal, yimag = [], []
+                hreal, himag = [], []
+                treal, timag = [], []
                 for i in range(4):
                     pygame.draw.circle(screen, scnd_page[i], (84 + 150 * i, 81), 10)
                 draw_text2("Y", screen, 18, 100, 71, WHITE)
@@ -265,46 +375,74 @@ while running:
                             if not previous and X > 72 and X < 90 and Y > 70 and Y < 89:
                                 previous = True
                                 parameter_page = False
-                                input_value2("Y11", 25, 150, 55 ,150, GREEN)
-                                if running: input_value2("Y12", 25, 250, 55 ,250, GREEN)
-                                if running: input_value2("Y21", 25, 350, 55 ,350, GREEN)
-                                if running: input_value2("Y21", 25, 450, 55 ,450, GREEN)
-                                if running:
-                                    # Formula
-                                    pass
+                                input_value2("Y11", 25, 150, 55 ,150, GREEN, yreal, yimag)
+                                if running: input_value2("Y12", 25, 250, 55 ,250, GREEN, yreal, yimag)
+                                if running: input_value2("Y21", 25, 350, 55 ,350, GREEN, yreal, yimag)
+                                if running: input_value2("Y21", 25, 450, 55 ,450, GREEN, yreal, yimag)
+                                if running:                                    
+                                    ytoz(), ytot(), ttoh()
+                                    roundoff(zreal, zimag), roundoff(treal, timag), roundoff(hreal, himag)
+                                    ans = []
+                                    addtolist()
+                                    for j in range(3):
+                                        for i in range(4):
+                                            draw_text2(ans[4*j+i], screen, 16, 155 + 190*j, 140 + 100*i, YELLOW)
                             if not previous and X > 222 and X < 240 and Y > 70 and Y < 89:
                                 parameter_page = False
                                 previous = True
-                                input_value2("Z11", 175, 150, 205 ,150, GREEN)
-                                if running: input_value2("Z12", 175, 250, 205 ,250, GREEN)
-                                if running: input_value2("Z21", 175, 350, 205 ,350, GREEN)
-                                if running: input_value2("Z21", 175, 450, 205 ,450, GREEN)
+                                input_value2("Z11", 205, 150, 235 ,150, GREEN, zreal, zimag)
+                                if running: input_value2("Z12", 205, 250, 235 ,250, GREEN, zreal, zimag)
+                                if running: input_value2("Z21", 205, 350, 235 ,350, GREEN, zreal, zimag)
+                                if running: input_value2("Z21", 205, 450, 235 ,450, GREEN, zreal, zimag)
                                 if running:
-                                    # Formula
-                                    pass
+                                    ztoy(), ytot(), ttoh()
+                                    roundoff(yreal, yimag), roundoff(treal, timag), roundoff(hreal, himag)
+                                    ans = []
+                                    addtolist()
+                                    for i in range(4):
+                                        draw_text2(ans[12+i], screen, 16, 10, 140 + 100*i, YELLOW)
+                                    for j in range(1, 3):
+                                        for i in range(4):
+                                            draw_text2(ans[4*j+i], screen, 16, 155 + 190*j, 140 + 100*i, YELLOW)
                             if not previous and X > 372 and X < 390 and Y > 70 and Y < 89:
                                 parameter_page = False
                                 previous = True
-                                input_value2("A", 325, 150, 355 ,150, GREEN)
-                                if running: input_value2("B", 325, 250, 355 ,250, GREEN)
-                                if running: input_value2("C", 325, 350, 355 ,350, GREEN)
-                                if running: input_value2("D", 325, 450, 355 ,450, GREEN)
+                                input_value2("A", 355, 150, 385 ,150, GREEN, treal, timag)
+                                if running: input_value2("B", 355, 250, 385 ,250, GREEN, treal, timag)
+                                if running: input_value2("C", 355, 350, 385 ,350, GREEN, treal, timag)
+                                if running: input_value2("D", 355, 450, 385 ,450, GREEN, treal, timag)
                                 if running:
-                                    # Formula
-                                    pass
+                                    ttoy(), ytoz(), ttoh()
+                                    roundoff(yreal, yimag), roundoff(zreal, zimag), roundoff(hreal, himag)
+                                    ans = []
+                                    addtolist()
+                                    for i in range(4):
+                                        draw_text2(ans[i], screen, 16, 185, 120 + 100*i, YELLOW)
+                                    for i in range(4):
+                                        draw_text2(ans[8+i], screen, 16, 140 + 190*2, 120 + 100*i, YELLOW)
+                                    for i in range(4):
+                                        draw_text2(ans[12+i], screen, 16, 10, 160 + 100*i, YELLOW)
                             if not previous and X > 522 and X < 540 and Y > 70 and Y < 89:
                                 parameter_page = False
                                 previous = True
-                                input_value2("h11", 475, 150, 505 ,150, GREEN)
-                                if running: input_value2("h12", 475, 250, 505 ,250, GREEN)
-                                if running: input_value2("h21", 475, 350, 505 ,350, GREEN)
-                                if running: input_value2("h22", 475, 450, 505 ,450, GREEN)
+                                input_value2("h11", 505, 150, 535 ,150, GREEN, hreal, himag)
+                                if running: input_value2("h12", 505, 250, 535 ,250, GREEN, hreal, himag)
+                                if running: input_value2("h21", 505, 350, 535 ,350, GREEN, hreal, himag)
+                                if running: input_value2("h22", 505, 450, 535 ,450, GREEN, hreal, himag)
                                 if running:
-                                    # Formula
-                                    pass
+                                    htot(), ttoy(), ytoz()                                                                        
+                                    roundoff(yreal, yimag), roundoff(zreal, zimag), roundoff(treal, timag)
+                                    ans = []                                                                        
+                                    addtolist()
+                                    for i in range(4):
+                                        draw_text2(ans[i], screen, 16, 160, 160 + 100*i, YELLOW)
+                                    for i in range(4):
+                                        draw_text2(ans[4+i], screen, 16, 160 + 190, 120 + 100*i, YELLOW)
+                                    for i in range(4):
+                                        draw_text2(ans[12+i], screen, 16, 10, 120 + 100*i, YELLOW)
                     pygame.display.flip()
                 draw_text("PRESS 0 TO RETURN TO MAIN PAGE!!", screen, 18, 360, 600, GREEN)
-            # Operation 5
+            # Operation 4
             if main_page and  x > 75 and x < 91 and y > 540 and y < 557:
                 main_page = False
                 screen.fill(BLACK)
