@@ -222,11 +222,6 @@ def htot(treal, timag):
         treal = []
         timag = []
 
-def roundoff(real, imag):
-    for i in range(4):
-        real[i] = round(real[i], 4)
-        imag[i] = round(imag[i], 4)
-
 def addtolist():
     try:
         ans.append("Z11 = " + str(complex(zreal[0], zimag[0])))
@@ -308,6 +303,7 @@ scnd_page = [MIX] * 4
 running = True
 main_page = True
 parameter_page = False
+
 while running:
     clock.tick(FPS)
     for event in pygame.event.get():
