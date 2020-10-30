@@ -448,9 +448,11 @@ while running:
                                     addtolist()
                                     for i in range(4):
                                         draw_text2(ans[12+i], screen, 16, 10, 140 + 100*i, YELLOW)
-                                    for j in range(1, 3):
+                                    for j in range(1, 2):
                                         for i in range(4):
-                                            draw_text2(ans[4*j+i], screen, 16, 155 + 190*j, 140 + 100*i, YELLOW)
+                                            draw_text2(ans[4*j+i], screen, 16, 145 + 190*j, 140 + 100*i, YELLOW)
+                                    for i in range(4):
+                                        draw_text2(ans[8+i], screen, 16, 135 + 380, 140 + 100*i, YELLOW)
                             if not previous and X > 372 and X < 390 and Y > 70 and Y < 89:
                                 parameter_page = False
                                 previous = True
