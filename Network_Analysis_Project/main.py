@@ -6,7 +6,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
-#Constants
+#Constants and Colours
 HEIGHT = 720
 WIDTH = 1280
 FPS = 30
@@ -52,7 +52,7 @@ def input_value(string, string_x, string_y, val_x, val_y, colour):
                 elif te.key == pygame.K_BACKSPACE:
                     n = len(string)
                     string = string[:n-1]
-                    screen.fill(ORANGE, rect = (val_x, val_y, WIDTH / 10, 15))
+                    screen.fill(ORANGE, rect = (val_x, val_y, WIDTH / 15, 15))
                 else:
                     string += te.unicode
         text_surf = base_font.render(string, False, WHITE)
