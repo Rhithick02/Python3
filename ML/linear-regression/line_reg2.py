@@ -1,10 +1,10 @@
 import pandas as pd 
 import matplotlib.pyplot as plt 
+import numpy as np
 
 dataframe = pd.read_csv("student_scores.csv")
-print(dataframe)
-X = dataframe["Hours"].values.reshape(-1, 1)
-Y = dataframe["Scores"].values.reshape(-1, 1)
+X = np.array(dataframe["Hours"])
+Y = np.array(dataframe["Scores"])
 Y_predict = []
 m = len(X)
 alpha = 0.01
@@ -22,4 +22,4 @@ for i in range(25):
     Y_predict.append(theta[0] + theta[1] * X[i])
 plt.plot(X, Y_predict)
 plt.show()
-    
+# y -> scores = theta0 + theta1 * x -> hours
